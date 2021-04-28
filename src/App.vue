@@ -13,27 +13,21 @@
             clearable
             @input="regWaitforCheckValChange"
             @blur="regWaitforCheckValSelect"
-          >
-          </el-input>
+          ></el-input>
         </div>
         <div class="reg-result">
-          <el-input type="textarea" spellcheck="false" disabled :rows="4" placeholder="匹配结果..." v-model="regCheckedResult" clearable> </el-input>
+          <el-input type="textarea" spellcheck="false" disabled :rows="4" placeholder="匹配结果..." v-model="regCheckedResult" clearable></el-input>
         </div>
         <div class="reg-val">
-          <el-input
-            class="reg-input"
-            placeholder="请选择或输入正则表达式"
-            v-model="inputRegVal"
-            clearable
-            @focus="inputRegValSelect"
-            @blur="inputRegValSelect"
-            @input="inputRegValChange"
-          >
+          <el-input class="reg-input" placeholder="请选择或输入正则表达式" v-model="inputRegVal" clearable @focus="inputRegValSelect" @blur="inputRegValSelect" @input="inputRegValChange">
             <template slot="prepend">/</template>
             <template slot="append">/{{ checkedRegModifiers.join('') }}</template>
           </el-input>
           <el-popover placement="bottom" trigger="hover">
-            <el-button slot="reference">修饰符<i class="el-icon-caret-bottom el-icon--right"></i></el-button>
+            <el-button slot="reference">
+              修饰符
+              <i class="el-icon-caret-bottom el-icon--right"></i>
+            </el-button>
             <el-checkbox-group class="reg-modifier" v-model="checkedRegModifiers" @change="handleCheckedRegModifiersChange">
               <el-checkbox v-for="(item, index) in regModifierOptions" :key="index" :checked="item.checked" :label="item.value">{{ item.label }}</el-checkbox>
             </el-checkbox-group>
@@ -50,7 +44,7 @@
             </template>
           </el-input>
           <!-- <el-button type="primary" @click="autoBuildRegexp">选中文本智能生成</el-button>
-              <el-input-number v-model="precisionRate" :min="1" label="精确度"></el-input-number> -->
+          <el-input-number v-model="precisionRate" :min="1" label="精确度"></el-input-number>-->
         </div>
       </div>
       <div class="reg-right">
@@ -241,6 +235,7 @@ export default class App extends Vue {
     },
   ];
   precisionRate = 5;
+  needEscapeChats = ['*', '.', '?', '+', '$', '^', '[', ']', '(', ')', '{', '}', '|', '\\', '/'];
 
   regWaitforCheckValChange(event: InputEvent) {
     const that = this;
@@ -314,24 +309,40 @@ export default class App extends Vue {
     }
     let regexp = '';
     if (that.lastWaitforCheckValSelectionStart >= that.precisionRate) {
-      regexp += `(?<=${that.regWaitforCheckVal.substr(that.lastWaitforCheckValSelectionStart - that.precisionRate, that.precisionRate)})`;
+      regexp += `(?<=${that.escapeToRegexp(that.regWaitforCheckVal.substr(that.lastWaitforCheckValSelectionStart - that.precisionRate, that.precisionRate))})`;
     } else if (that.lastWaitforCheckValSelectionStart > 0) {
-      regexp += `(?<=${that.regWaitforCheckVal.substring(0, that.lastWaitforCheckValSelectionStart)})`;
+      regexp += `(?<=${that.escapeToRegexp(that.regWaitforCheckVal.substring(0, that.lastWaitforCheckValSelectionStart))})`;
     } else {
       regexp += '^';
     }
     regexp += `.*?`;
     if (that.lastWaitforCheckValSelectionEnd <= that.regWaitforCheckVal.length - that.precisionRate) {
-      regexp += `(?=${that.regWaitforCheckVal.substr(that.lastWaitforCheckValSelectionEnd, that.precisionRate)})`;
+      regexp += `(?=${that.escapeToRegexp(that.regWaitforCheckVal.substr(that.lastWaitforCheckValSelectionEnd, that.precisionRate))})`;
     } else if (that.lastWaitforCheckValSelectionEnd === that.regWaitforCheckVal.length) {
       regexp += `$`;
     } else {
-      regexp += `(?=${that.regWaitforCheckVal.substring(that.lastWaitforCheckValSelectionEnd, that.regWaitforCheckVal.length)})`;
+      regexp += `(?=${that.escapeToRegexp(that.regWaitforCheckVal.substring(that.lastWaitforCheckValSelectionEnd, that.regWaitforCheckVal.length))})`;
     }
     that.inputRegVal = regexp;
     that.renderRegResult();
     // 选中原始内容
     that.setWaitforCheckValSelected(that.lastWaitforCheckValSelectionStart, that.lastWaitforCheckValSelectionEnd);
+  }
+
+  escapeToRegexp(str: string) {
+    const that = this;
+    if (str && str.length > 0) {
+      const strChats = [...str];
+      for (let i = 0; i < strChats.length; i++) {
+        const strChat = strChats[i];
+        if (that.needEscapeChats.includes(strChat)) {
+          strChats[i] = `\\${strChat}`;
+        }
+      }
+      const escapeStr = strChats.join('');
+      return escapeStr;
+    }
+    return str;
   }
 
   setWaitforCheckValSelected(startIndex, endIndex) {
