@@ -1,5 +1,10 @@
 <template>
   <div id="app">
+    <div class="reg-stars">
+      <a href="https://github.com/adams549659584/fast-regexp" target="_blank">
+        <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/adams549659584/fast-regexp?style=social" />
+      </a>
+    </div>
     <div class="reg-container">
       <div class="reg-left">
         <div class="reg-check">
@@ -358,6 +363,11 @@ export default class App extends Vue {
 </script>
 
 <style lang="less" scoped>
+.reg-stars {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
 .reg-container {
   width: 100%;
   margin: 5vh auto;
@@ -396,7 +406,6 @@ export default class App extends Vue {
     }
   }
 }
-
 .reg-modifier.el-checkbox-group {
   width: 175px;
   margin: 0;
