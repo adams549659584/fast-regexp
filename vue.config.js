@@ -7,6 +7,7 @@ function resolve(dir) {
 
 module.exports = {
   publicPath: '/',
+  outputDir: 'docs',
   lintOnSave: true,
   filenameHashing: false,
   // webpack目录别名alias
