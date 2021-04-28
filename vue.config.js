@@ -6,7 +6,7 @@ function resolve(dir) {
 }
 
 module.exports = {
-  publicPath: '/',
+  publicPath: '/fast-regexp/',
   outputDir: 'docs',
   lintOnSave: true,
   filenameHashing: false,
